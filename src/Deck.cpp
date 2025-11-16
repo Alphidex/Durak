@@ -12,17 +12,20 @@ Deck::Deck() {
     
     for (auto suit : suits) {
         for (auto rank : ranks) {
-            cards.push_back(rank + " of " + suit);
+            cards.push_back(Card(rank + " of " + suit));
         }
     }
     Shuffle();
 }
 
-vector<string> Deck::DealCards(int count) {
-    vector<string> dealt;
+vector<Card> Deck::DealCards(int count) {
+    vector<Card> dealt;
     for (int i = 0; i < count && !cards.empty(); ++i) {
         dealt.push_back(cards.back());
         cards.pop_back();
+    }
+    if (cards.empty()) {
+        print(string('-', 10) + "\n\tDeck is out of cards!\n" + string('-', 10));
     }
     return dealt;
 }
@@ -30,19 +33,24 @@ vector<string> Deck::DealCards(int count) {
 void Deck::Shuffle() {
     auto rng = default_random_engine {};
     shuffle(begin(cards), end(cards), rng);
+    print("\tDeck shuffled.");
+}
+
+bool Deck::Empty() {
+    return cards.size() == 0;
 }
 
 string Deck::GetKoz()
 {
     if (koz == "None")
     {
-        string trump = cards.back();
-        koz = split_space(trump).back();
-
+        Card trump = cards.back();
+        koz = split_space(trump.name).back();
+        
         // The shown trump-card goes to the front
         cards.pop_back();
         cards.insert(cards.begin(), trump);
     } 
-
+    print("\t*** Koz is: " + koz + " ***");
     return koz;
 }

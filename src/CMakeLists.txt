@@ -5,11 +5,11 @@ target_sources(Game PRIVATE
     Game.cpp
     Player.cpp
     Deck.cpp
+    Card.cpp
 )
 
 target_link_libraries(Game
     PRIVATE
-        fmt::fmt
         Utility
 )
 
