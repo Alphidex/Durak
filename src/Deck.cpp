@@ -33,7 +33,6 @@ vector<Card> Deck::DealCards(int count) {
 void Deck::Shuffle() {
     auto rng = default_random_engine {};
     shuffle(begin(cards), end(cards), rng);
-    print("\tDeck shuffled.");
 }
 
 bool Deck::Empty() {
@@ -51,6 +50,6 @@ string Deck::GetKoz()
         cards.pop_back();
         cards.insert(cards.begin(), trump);
     } 
-    print("\t*** Koz is: " + koz + " ***");
+    print("\n\t*** Koz is: " + koz + " ***");
     return koz;
 }

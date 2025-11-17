@@ -12,4 +12,5 @@ void print(T s) {cout << s << endl;}
 string input(string s);
 bool is_integer(string s);
 vector<string> split_space(string s);
+string repeat(string s, int n);
 }

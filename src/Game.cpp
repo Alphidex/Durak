@@ -7,7 +7,6 @@ Game::Game(){
     while (player_count < 2 || player_count > 5){
         print("Choose the number of players. (Must be between 2 and 5)");
         player_count = stoi(input("Enter player count: "));
-        assert(1 < player_count && player_count < 6); // Limit players between 2 and 5
     }
     
     for(int i = 0; i < player_count; ++i){
@@ -30,7 +29,7 @@ int Game::GetStartingTurn(){
             smallest_card = card;
         }
     }
-    print("Player " + players[turn].name + " starts first.\n");
+    print("\n" + players[turn].name + " is the starting player.");
     return turn;
 }
 
@@ -50,39 +49,41 @@ void Game::NewRound(){
     // Makes it easier for checking
     attacker_turn = turn;
     defender_turn = (turn+1) % player_count;
-    Player attacker = players[attacker_turn];
-    Player defender = players[defender_turn];
+    Player* attacker = &players[attacker_turn];
+    Player* defender = &players[defender_turn];
 
-    print(string('-', 15) + "\nNew Round Begins!\n" + string('-', 15));
-    print("Attacker: " + attacker.name + " | Defender: " + defender.name + "\n");
+    print("\nNew Round Begins!" + string('-', 15));
+    print("Attacker: " + attacker->name + " | Defender: " + defender->name);
 
-    while(attacks < 6 && passes != player_count-1 && !failed_to_defend){
+    while(!defender->Empty() && passes != player_count-1 && !failed_to_defend){
         if (attacks == 0){
             attacks++;
-            string attack_state = attacker.Attack(koz, {}); // Attack state can be either a Card or a Pass
-            string defense_state = defender.Defend(koz, attack_state); // Either a Card or a Fail
+            string attack_state = attacker->Attack(koz, {}); // Attack state can be either a Card or a Pass
+            string defense_state = defender->Defend(koz, attack_state); // Either a Card or a Fail
             if (defense_state == "Fail") failed_to_defend = true;
             else {cards_in_round.push_back(defense_state);}
             cards_in_round.push_back(attack_state); 
         } else {
-            attacker = players[attacker_turn];
+            attacker = &players[attacker_turn];
 
-            string attack_state = attacker.Attack(koz, cards_in_round);
+            string attack_state = attacker->Attack(koz, cards_in_round);
             if (attack_state == "Pass") {passes++; NextAttacker(); continue;}
             cards_in_round.push_back(attack_state);
             passes = 0;
             attacks++;
 
-            string defense_state = defender.Defend(koz, attack_state); 
+            string defense_state = defender->Defend(koz, attack_state); 
             if (defense_state == "Fail") {failed_to_defend = true; break;}
             cards_in_round.push_back(defense_state);
         }
+
+        CheckIfPlayersOut();
     }
 
     // Defender picks up all cards if they failed to defend.
     if (failed_to_defend) {
-        print(defender.name + " failed to defend and picks up all cards in the round.");
-        defender.PickupCards(cards_in_round);
+        print(defender->name + " failed to defend and picks up all cards in the round.");
+        defender->PickupCards(cards_in_round);
         turn = (turn + 2) % player_count;
     } else {
         turn = (turn + 1) % player_count;
@@ -101,15 +102,15 @@ void Game::RestockCards()
 {
     // Attackers pick-up cards first in clockwise direction, then defender last.
     for (int i = 0; i < player_count-1; i++){
-        Player player = players[attacker_turn];
-        player.PickupCards(deck.DealCards(cards_per_player - player.cards.size()));
+        Player* player = &players[attacker_turn];
+        player->PickupCards(deck.DealCards(cards_per_player - player->cards.size()));
         NextAttacker();
     }
-    Player player = players[defender_turn];
-    player.PickupCards(deck.DealCards(cards_per_player - player.cards.size()));
+    Player* player = &players[defender_turn];
+    player->PickupCards(deck.DealCards(cards_per_player - player->cards.size()));
 }
 
-void Game::CheckIfPlayersOut(int defender, int attacker)
+void Game::CheckIfPlayersOut()
 {
     vector<int> to_remove = {};
     for (int i = 0; i < players.size(); i++){
@@ -121,12 +122,14 @@ void Game::CheckIfPlayersOut(int defender, int attacker)
     for (int i : to_remove){
         players.erase(players.begin() + i);
         player_count--;
-    }
-    if (defender == i){
-        turn--;
-    } else if (attacker == i) {
 
-    } else {
-        throw 'Error';
+        if (defender_turn == i){
+            turn--;
+            // Prob something else
+        } else if (attacker_turn == i) {
+            attacker_turn--;
+        } else {
+            throw "Error";
+        }
     }
 }

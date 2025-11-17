@@ -20,4 +20,9 @@ vector<string> split_space(string s)
     }
     return v;
 }
+
+string repeat(string s, int n){
+    for (int i = 0; i <n; i++)
+}
+
 }

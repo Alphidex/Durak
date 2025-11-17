@@ -9,7 +9,6 @@ using namespace myUtility;
 std::vector<std::string> ranks = {"6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"};
 std::vector<std::string> suits = {"Hearts", "Diamonds", "Clubs", "Spades"};
 
-
 Card::Card(string s){
     vector<string> rank_suit = split_space(s);
     rank = rank_suit.front();

@@ -17,4 +17,5 @@ public:
     void PickupCards(vector<Card> picked_cards);
     string Attack(string koz, vector<Card> cards_in_round);
     string Defend(string koz, Card attack_card);
+    ~Player();
 };

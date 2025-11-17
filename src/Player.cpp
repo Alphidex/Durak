@@ -34,7 +34,7 @@ string Player::Attack(string koz, vector<Card> cards_in_round){
     print(string('-', 20));
     print(name + " these are the cards in your hand:");
     for(Card card : cards){
-        print("- " + card.name);
+        print("\t- " + card.name);
     }
 
     vector<Card> filtered_cards = {};
@@ -95,10 +95,13 @@ string Player::Defend(string koz, Card attack_card){
         print("\t- " + card.name);
     }
 
-    vector<Card> filtered_cards = {};
-    for (Card card : cards){
-        if (card.BiggerThan(attack_card, koz))
-            filtered_cards.push_back(card);
+    vector<int> filtered_cards = {};
+    for (int i=0; i < cards.size(); i++){
+        Card card = cards[i];
+        if (card.BiggerThan(attack_card, koz) && (card.suit == koz || card.suit == attack_card.suit))
+        {   
+            filtered_cards.push_back(i);
+        }
     }
 
     if (filtered_cards.size() == 0) {
@@ -107,23 +110,27 @@ string Player::Defend(string koz, Card attack_card){
         return "Fail";
     }
 
-    print("\n"+ name + ", pick a card to defend: ");
+    print("\n"+ name + ", you can only defend with the following (pick one) : ");
     for (int i = 0; i < filtered_cards.size(); i++){
-        print(to_string(i+1) + ".) " + cards[i].name);
+        print(to_string(i+1) + ".) " + cards[filtered_cards[i]].name);
     }
 
-    int card_index = stoi(input("Card: "));
+    int card_index = stoi(input("Card: ")) - 1;
     // Validate input
-    while (card_index < 1 || card_index > filtered_cards.size()){
+    while (card_index < 0 || card_index >= filtered_cards.size()){
         print("Invalid option. Please choose again.");
-        card_index = stoi(input("Card: "));
+        card_index = stoi(input("Card: ")) - 1;
     }
 
-    Card chosen_card = cards[card_index];
-    cards.erase(cards.begin() + card_index);
+    Card chosen_card = cards[filtered_cards[card_index]];
+    cards.erase(cards.begin() + filtered_cards[card_index]);
 
     print("Player " +  to_string(id) + " defended with " + chosen_card.name + ".");
     print(string('-', 20));
 
     return chosen_card.name;
 }
+
+Player::~Player(){
+    print("This instance was deleted. !!!!!!!!!");
+};
