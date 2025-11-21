@@ -31,65 +31,78 @@ bool Player::Empty(){
 }
 
 string Player::Attack(string koz, vector<Card> cards_in_round){
-    print(string('-', 20));
+    bool first_attack = cards_in_round.size() == 0;
+
+    print(repeat("-", 20));
+
+    print("These are the cards that have been played this round:");
+    for (Card card : cards_in_round){
+        print("\t- " + card.name);
+    }
+    print("\n");
+
+    // Show all cards
     print(name + " these are the cards in your hand:");
     for(Card card : cards){
         print("\t- " + card.name);
     }
 
-    vector<Card> filtered_cards = {};
-    if (cards_in_round.size() > 0){
-        for (Card card_in_round : cards_in_round){
-            for (Card card_in_hand : cards){
+    vector<int> filtered_cards = {};
+    if (!first_attack){
+        for (int i=0; i<cards.size(); i++){
+            Card card_in_hand = cards[i];
+            for (Card card_in_round : cards_in_round){
                 if (card_in_round.rank == card_in_hand.rank) 
-                    filtered_cards.push_back(card_in_hand);
+                    {filtered_cards.push_back(i); break; }
             }
         }
-        if (filtered_cards.size() == 0){
-            print(name + ", you have no valid cards to attack with. You must pass.");
-            print(string('-', 20));
-            return "Pass";
-        }
     } else {
-        filtered_cards = cards;
+        for (int i=0; i<cards.size(); i++){
+            filtered_cards.push_back(i);
+        }
     }
 
-    print(name + ", these are the cards you can attack with (pick one): ");
-    for (int i = 0; i < filtered_cards.size(); i++){
-        print(to_string(i+1) + ".) " + cards[i].name);
-    }
-
-    // Allow passing if not the first attack
-    if (cards_in_round.size() > 0){
-        print(to_string(filtered_cards.size()+1) + ".) Pass");
-    }
-
-    int card_index = stoi(input("Option: ")) - 1;
-    
-    // Check for pass
-    if (card_index == filtered_cards.size() && cards_in_round.size() > 0){
-        print(name + " has chosen to pass.");
-        print(string('-', 20));
+    if (filtered_cards.size() == 0){
+        print(name + ", you have no valid cards to attack with. You must pass.");
         return "Pass";
     }
 
+    print("\n" + name + ", these are the cards you can attack with (pick one): ");
+    for (int i = 0; i < filtered_cards.size(); i++){
+        print(to_string(i+1) + ".) " + cards[filtered_cards[i]].name);
+    }
+
+    // Allow passing if not the first attack
+    if (!first_attack)
+        print(to_string(filtered_cards.size()+1) + ".) Pass");
+    
+    int card_index = stoi(input("Option: ")) - 1;
+
     // Validate input
-    while (card_index < 0 || card_index >= filtered_cards.size()){
+    while (card_index < 0 || (first_attack && card_index >= filtered_cards.size()) || 
+                             (!first_attack && card_index > filtered_cards.size())){
         print("Invalid option. Please choose again.");
         card_index = stoi(input("Option: ")) - 1;
     }
 
-    Card chosen_card = cards[card_index];
-    cards.erase(cards.begin() + card_index);
+    // Check for pass
+    if (card_index == filtered_cards.size() && !first_attack)
+    {
+        print(name + " has chosen to pass.");
+        return "Pass";
+    }
+
+    int idx = filtered_cards[card_index];
+    Card chosen_card = cards[idx];
+    cards.erase(cards.begin() + idx);
 
     print("Player " + to_string(id) + " played a " + chosen_card.name + ".");
-    print(string('-', 20));
 
     return chosen_card.name;
 }
 
 string Player::Defend(string koz, Card attack_card){
-    print(string('-', 20));
+    print(repeat("-", 20));
     print(name + " these are the cards in your hand:");
     for(Card card : cards){
         print("\t- " + card.name);
@@ -106,7 +119,7 @@ string Player::Defend(string koz, Card attack_card){
 
     if (filtered_cards.size() == 0) {
         print("Player " + to_string(id) + " has nothing to defend with.");
-        print(string('-', 20));
+        print(repeat("-", 20));
         return "Fail";
     }
 
@@ -116,21 +129,21 @@ string Player::Defend(string koz, Card attack_card){
     }
 
     int card_index = stoi(input("Card: ")) - 1;
+
     // Validate input
     while (card_index < 0 || card_index >= filtered_cards.size()){
         print("Invalid option. Please choose again.");
         card_index = stoi(input("Card: ")) - 1;
     }
 
-    Card chosen_card = cards[filtered_cards[card_index]];
-    cards.erase(cards.begin() + filtered_cards[card_index]);
+    int idx = filtered_cards[card_index];
+    Card chosen_card = cards[idx];
+    cards.erase(cards.begin() + idx);
 
     print("Player " +  to_string(id) + " defended with " + chosen_card.name + ".");
-    print(string('-', 20));
-
     return chosen_card.name;
 }
 
 Player::~Player(){
-    print("This instance was deleted. !!!!!!!!!");
+    print("This instance was deleted.!");
 };

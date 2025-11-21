@@ -10,8 +10,7 @@ Game::Game(){
     }
     
     for(int i = 0; i < player_count; ++i){
-        Player player(i+1, deck.DealCards(cards_per_player));
-        players.push_back(player);
+        players.emplace_back(i+1, deck.DealCards(cards_per_player));
     }
 
     koz = deck.GetKoz();
@@ -52,8 +51,9 @@ void Game::NewRound(){
     Player* attacker = &players[attacker_turn];
     Player* defender = &players[defender_turn];
 
-    print("\nNew Round Begins!" + string('-', 15));
-    print("Attacker: " + attacker->name + " | Defender: " + defender->name);
+    print(repeat("-", 30));
+    print("New Round Begins!");
+    print("\nAttacker: " + attacker->name + " | Defender: " + defender->name);
 
     while(!defender->Empty() && passes != player_count-1 && !failed_to_defend){
         if (attacks == 0){

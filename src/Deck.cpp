@@ -2,6 +2,7 @@
 #include "myUtility.h"
 #include <random>
 #include <algorithm>
+#include <bits/stdc++.h>
 
 using namespace std;
 using namespace myUtility;
@@ -25,14 +26,18 @@ vector<Card> Deck::DealCards(int count) {
         cards.pop_back();
     }
     if (cards.empty()) {
-        print(string('-', 10) + "\n\tDeck is out of cards!\n" + string('-', 10));
+        print("\n\tDeck is out of cards!\n");
     }
     return dealt;
 }
 
 void Deck::Shuffle() {
-    auto rng = default_random_engine {};
-    shuffle(begin(cards), end(cards), rng);
+    // Initialize random number generator
+    random_device rd;
+    mt19937 g(rd());
+
+    // Shuffle the vector
+    shuffle(cards.begin(), cards.end(), g);
 }
 
 bool Deck::Empty() {

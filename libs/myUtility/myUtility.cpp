@@ -22,7 +22,10 @@ vector<string> split_space(string s)
 }
 
 string repeat(string s, int n){
-    for (int i = 0; i <n; i++)
+    string out = "";
+    for (int i = 0; i <n; i++){
+        out += s;
+    }
+    return out;
 }
-
 }
